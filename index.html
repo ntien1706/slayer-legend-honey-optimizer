@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slayer Legend · Ultimate Optimizer</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: #1a2a1f; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; margin: 0; padding: 20px; }
+        
+        .card { 
+            background: #fbf7e9; background-image: radial-gradient(circle at 20% 30%, #fff8e7, #f5e8d3);
+            max-width: 600px; width: 100%; border-radius: 42px; padding: 28px; border: 2px solid #f3c26b;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 1.8rem; color: #3d2f1b; text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 0 #fde4b3; }
+        
+        /* Input Sections */
+        .section-title { font-size: 0.8rem; font-weight: 800; color: #8b7a5b; text-transform: uppercase; margin: 15px 0 10px 10px; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .input-item { background: #e9dbc4; border-radius: 20px; padding: 12px 15px; display: flex; flex-direction: column; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1); }
+        .input-item label { font-size: 0.7rem; font-weight: 700; color: #5f4a2e; margin-bottom: 4px; }
+        .input-item input { background: transparent; border: none; font-size: 1.1rem; font-weight: 800; color: #2e3d1f; outline: none; }
+
+        .button {
+            background: #fec642; border: none; font-size: 1.4rem; font-weight: 800; padding: 16px; width: 100%;
+            border-radius: 30px; color: #2b4719; text-transform: uppercase; cursor: pointer;
+            box-shadow: 0 6px 0 #b47d2e, 0 8px 15px rgba(0,0,0,0.2); transition: 0.1s; margin-bottom: 25px;
+        }
+        .button:active { transform: translateY(4px); box-shadow: 0 2px 0 #b47d2e; }
+
+        /* Visualization */
+        .verdict-box { background: #2d4025; border-radius: 25px; padding: 20px; color: #fef7d6; border: 3px solid #fec95c; text-align: center; display: none; margin-bottom: 20px; }
+        .verdict-title { font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
+        .verdict-main { font-size: 1.8rem; font-weight: 900; margin: 5px 0; color: #fec642; }
+
+        /* Roadmap List */
+        #roadmap { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .roadmap-step { 
+            background: #faf0d7; border-left: 6px solid #f5b342; border-radius: 0 15px 15px 0;
+            padding: 12px 18px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            animation: slideIn 0.3s ease-out forwards; opacity: 0;
+        }
+        .step-info b { color: #3d2f1b; font-size: 1rem; }
+        .step-info div { font-size: 0.75rem; color: #8b7a5b; }
+        .step-eta { font-weight: 800; font-size: 0.8rem; padding: 4px 10px; border-radius: 10px; }
+        .eta-now { background: #5d813a; color: white; }
+        .eta-wait { background: #dcb030; color: #3d2f1b; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #c9a75a; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🍯 HONEY OPTIMIZER</h1>
+
+    <div class="section-title">🕒 Event Timing</div>
+    <div class="input-grid">
+        <div class="input-item"><label>Days Left</label><input type="number" id="days" value="13"></div>
+        <div class="input-item"><label>Hours Left</label><input type="number" id="hours" value="19"></div>
+        <div class="input-item" style="grid-column: span 2;"><label>My Typical Runs Per Day</label><input type="number" id="dailyRuns" value="16"></div>
+    </div>
+
+    <div class="section-title">📊 Current Stats</div>
+    <div class="input-grid">
+        <div class="input-item"><label>Honey Held</label><input type="number" id="held" value="1000"></div>
+        <div class="input-item"><label>Honey Lvl</label><input type="number" id="hLvl" value="3"></div>
+        <div class="input-item"><label>Gold Lvl</label><input type="number" id="gLvl" value="2"></div>
+    </div>
+
+    <button class="button" onclick="optimize()">🔮 Analyze Path</button>
+
+    <div id="verdictBox" class="verdict-box">
+        <div class="verdict-title">Next Strategic Move</div>
+        <div id="verdictMain" class="verdict-main">---</div>
+        <div id="verdictSub" style="font-size: 0.8rem;">---</div>
+    </div>
+
+    <div id="roadmap"></div>
+</div>
+
+<script>
+function optimize() {
+    let d = parseFloat(document.getElementById('days').value) || 0;
+    let hr = parseFloat(document.getElementById('hours').value) || 0;
+    let runsPerDay = parseFloat(document.getElementById('dailyRuns').value) || 0;
+    let held = parseInt(document.getElementById('held').value) || 0;
+    let h = parseInt(document.getElementById('hLvl').value) || 0;
+    let g = parseInt(document.getElementById('gLvl').value) || 0;
+
+    let totalRunsRemaining = Math.floor((d + (hr/24)) * runsPerDay);
+    let tempH = h, tempG = g, tempHoney = held, remaining = totalRunsRemaining;
+    
+    const roadmap = document.getElementById('roadmap');
+    const vBox = document.getElementById('verdictBox');
+    roadmap.innerHTML = "";
+    vBox.style.display = "block";
+
+    for (let i = 1; i <= 30; i++) {
+        let nHC = (tempH + 1) * 100;
+        let nGC = (tempG + 1) * 100;
+
+        // ROI Math: (Relative Gain / Cost) * Remaining Time
+        let hROI = (0.10 / (1 + (tempH * 0.10))) / nHC;
+        let gROI = (0.03 / (1 + (tempG * 0.03))) / nGC;
+
+        let buyHoney = (remaining > (tempH + 1) && (hROI * remaining > gROI));
+        let cost = buyHoney ? nHC : nGC;
+        let income = 1000 + (tempH * 100);
+        
+        let wait = 0;
+        if (tempHoney < cost) {
+            wait = Math.ceil((cost - tempHoney) / income);
+            tempHoney += (wait * income);
+        }
+        tempHoney -= cost;
+        remaining -= wait;
+
+        if (remaining < 0) break;
+
+        if (i === 1) {
+            document.getElementById('verdictMain').innerText = `UPGRADE ${buyHoney ? 'HONEY' : 'GOLD'}`;
+            document.getElementById('verdictSub').innerText = wait === 0 ? "You can afford this now!" : `Do ${wait} more runs to afford this.`;
+        }
+
+        if (buyHoney) tempH++; else tempG++;
+
+        let step = document.createElement('div');
+        step.className = "roadmap-step";
+        if (!buyHoney) step.style.borderLeftColor = "#5d813a";
+        step.style.animationDelay = (i * 0.05) + "s";
+        step.innerHTML = `
+            <div class="step-info">
+                <b>${buyHoney ? '🍯 Honey' : '🪙 Gold'} to Lvl ${buyHoney ? tempH : tempG}</b>
+                <div>Cost: ${cost} | Runs Left: ${remaining}</div>
+            </div>
+            <div class="step-eta ${wait==0?'eta-now':'eta-wait'}">${wait==0?'READY':'+'+wait+' Runs'}</div>
+        `;
+        roadmap.appendChild(step);
+    }
+}
+</script>
+</body>
+</html>
