@@ -1,0 +1,9 @@
+{
+  "name": "Slayer Legend Optimizer",
+  "short_name": "Slayer Opt",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a2a1f",
+  "theme_color": "#1a2a1f",
+  "description": "Optimal Honey Event Path"
+}
